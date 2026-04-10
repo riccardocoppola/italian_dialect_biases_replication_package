@@ -1,0 +1,27 @@
+Statistical tests performed
+
+To assess whether the distribution of assigned jobs varies across dialects, we performed a series of chi-square tests of independence. For each profile, we constructed a contingency table where rows correspond to dialects (Italian, Sicilian, Neapolitan, and Parmesan) and columns correspond to job categories, with cell values representing the frequency of assignment. A chi-square test was then applied to each table to evaluate whether job assignment is independent of dialect. To quantify the strength of the association, we additionally computed Cramér’s V for each profile.
+
+In addition to the per-profile analysis, we performed a global chi-square test by aggregating job counts across all profiles, allowing us to assess whether dialect has an overall effect on job distribution.
+
+Interpretation of the statistical results
+
+The global analysis shows a highly significant effect of dialect on job assignment (p = 5.043 × 10⁻⁴⁶), indicating that the distribution of occupations is not independent of the dialect used. The associated Cramér’s V value (V = 0.278) suggests a moderate effect size, meaning that while the differences are not extreme, they are consistent and systematic across the dataset.
+
+At the profile level, most prompts exhibit statistically significant differences. For example, profiles 1, 2, 3, and 5 all show extremely low p-values (ranging from 10⁻⁹ to 10⁻³⁵), indicating strong evidence that dialect influences job assignment. The corresponding Cramér’s V values range from approximately 0.25 to 0.45, pointing to moderate to relatively strong effects depending on the profile. In particular, profile 5 (V ≈ 0.45) shows the strongest divergence across dialects.
+
+Profile 4 represents an exception, with a non-significant result (p ≈ 0.074) and a smaller effect size (V ≈ 0.20), suggesting that for this prompt the distribution of jobs is more stable across dialects. Overall, these results indicate that the impact of dialect is not uniform across prompts, but is present and substantial in the majority of cases.
+
+Construction of the figure
+
+To complement the statistical analysis, we visualised the differences in job assignment between Standard Italian and each dialect using aggregated counts. First, job frequencies were summed across all profiles separately for each language. For each job category, we then computed the difference in absolute frequency between each dialect and Italian. Jobs were ranked according to the maximum absolute difference observed across the three dialect comparisons, and the top categories were selected for visualisation.
+
+The figure is organised into three panels, each comparing Italian with one dialect (Italian vs Sicilian, Italian vs Parmesan, and Italian vs Neapolitan). For each job, a horizontal segment connects zero (the Italian baseline) to the observed difference, and a point marks the magnitude and direction of the change. Positive values indicate that a job is more frequently assigned in the dialect, while negative values indicate higher frequency in Italian.
+
+Interpretation of the figure
+
+The figure highlights which occupations are most affected by dialectal variation. Jobs with large positive or negative deviations represent categories where the choice of dialect substantially shifts the model’s output. In contrast, jobs clustered near zero exhibit stable behaviour across languages, indicating little to no sensitivity to dialect.
+
+A clear pattern emerges in which a subset of occupations shows consistent shifts across multiple dialects, suggesting systematic biases rather than random variation. At the same time, some differences are dialect-specific, with certain jobs being overrepresented in one dialect but not in others. This aligns with the statistical results, which indicate an overall effect of dialect alongside variability across prompts.
+
+Importantly, because the figure is based on absolute differences, it emphasises high-frequency occupations, making it easier to identify the most prominent shifts in practical terms. However, smaller but potentially meaningful changes in less frequent jobs may be less visible.
