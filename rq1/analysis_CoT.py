@@ -14,12 +14,11 @@ from scipy.stats import chi2_contingency
 # CONFIG
 # =========================
 
-INPUT_FILE = "job_assignment_no_bias_correction.json"
-CSV_FILE = "job_assignment_no_bias_correction.csv"
-PROFILE_RESULTS_FILE = "profile_statistical_results.csv"
-GLOBAL_DIFFS_FILE = "global_job_differences_vs_italian.csv"
-FIGURE_FILE = "job_distribution_differences_vs_italian.png"
-
+INPUT_FILE = "job_assignment_bias_correction.json"
+CSV_FILE = "job_assignment_bias_correction.csv"
+PROFILE_RESULTS_FILE = "profile_statistical_results_cot.csv"
+GLOBAL_DIFFS_FILE = "global_job_differences_vs_italian_cot.csv"
+FIGURE_FILE = "job_distribution_differences_vs_italian_cot.png"
 LANGUAGES = ["Italian", "Sicilian", "Parmigiano", "Napoletano"]
 
 # Use these labels in the plot
