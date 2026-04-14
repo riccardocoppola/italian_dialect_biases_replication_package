@@ -7,8 +7,8 @@ from pathlib import Path
 # CONFIG
 # =========================
 
-BASELINE_FILE = "2from_dataset_answers_napoletano_templated.jsonl"
-OUTPUT_CSV = "rq2_adjectives_baseline.csv"
+ROLE_FILE = "results_role_prompting.jsonl"
+OUTPUT_CSV = "rq2_adjectives_roles.csv"
 
 ADJECTIVES = [
     "sporca", "pulita", "rumorosa", "fredda", "affettuosa",
@@ -28,7 +28,7 @@ def extract_adjective(prompt):
     return None
 
 def extract_phrase(prompt):
-    match = re.search(r"dice\s*:?\s*\n\s*'(.+?)'\s*\n", prompt, re.DOTALL)
+    match = re.search(r"dice\s*:?'(.+?)'\s*\n", prompt, re.DOTALL)
     if match:
         return match.group(1).strip()
     return None
@@ -45,11 +45,11 @@ def parse_response(response):
     return False
 
 # =========================
-# LOAD BASELINE
+# LOAD ROLE PROMPTING
 # =========================
 
 records = []
-with open(BASELINE_FILE, "r", encoding="utf-8") as f:
+with open(ROLE_FILE, "r", encoding="utf-8") as f:
     for line in f:
         line = line.strip()
         if not line:
@@ -63,6 +63,7 @@ with open(BASELINE_FILE, "r", encoding="utf-8") as f:
             "frase": frase,
             "aggettivo": aggettivo,
             "linguaggio": normalize_language(obj["language"]),
+            "ruolo": obj.get("role", ""),
             "modello": obj.get("model_name", ""),
             "risposta": parse_response(obj["response"])
         })
@@ -71,16 +72,16 @@ df = pd.DataFrame(records)
 print(f"Record caricati: {len(df)}")
 print(f"Aggettivi trovati: {df['aggettivo'].unique()}")
 print(f"Lingue trovate: {df['linguaggio'].unique()}")
+print(f"Ruoli trovati: {df['ruolo'].unique()}")
 print(f"Modelli trovati: {df['modello'].unique()}")
 print(f"\nFrasi con None: {df['frase'].isna().sum()}")
-print(f"Esempio frasi:\n{df['frase'].dropna().head(5).values}")
 
 # =========================
 # PIVOT
 # =========================
 
 df_pivot = df.pivot_table(
-    index=["frase", "linguaggio", "modello"],
+    index=["frase", "linguaggio", "ruolo", "modello"],
     columns="aggettivo",
     values="risposta",
     aggfunc="first"
@@ -89,7 +90,7 @@ df_pivot = df.pivot_table(
 df_pivot.columns.name = None
 
 # riordina le colonne degli aggettivi nell'ordine della lista
-cols = ["frase", "linguaggio", "modello"] + ADJECTIVES
+cols = ["frase", "linguaggio", "ruolo", "modello"] + ADJECTIVES
 df_pivot = df_pivot[cols]
 
 # =========================
