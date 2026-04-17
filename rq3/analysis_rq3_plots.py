@@ -31,6 +31,9 @@ COLOURS = {
     "Siciliano": "#3498db"
 }
 
+COLOR_SIG = "#2c3e50"
+COLOR_NOTSIG = "#ecf0f1"
+
 # =========================
 # HELPER — formato p-value con esponente
 # =========================
@@ -94,7 +97,7 @@ def plot_barchart(df_data, df_results, suffix, condition_label, filename):
 
 
 # =========================
-# OPZIONE C — TABELLA DI SIGNIFICATIVITÀ
+# TABELLA COMPLETA (Raw + Refined + Final)
 # =========================
 
 def plot_significance_table(df_results_2, df_results_3, filename):
@@ -103,10 +106,6 @@ def plot_significance_table(df_results_2, df_results_3, filename):
 
     table_data = []
     cell_colors = []
-
-    # colori bianco/nero friendly
-    COLOR_SIG = "#2c3e50"      # blu scuro per significativo
-    COLOR_NOTSIG = "#ecf0f1"   # grigio chiaro per non significativo
 
     for dim in DIMENSIONS:
         row = [dim]
@@ -141,19 +140,81 @@ def plot_significance_table(df_results_2, df_results_3, filename):
     table.set_fontsize(11)
     table.scale(1.2, 1.8)
 
-    # testo bianco per celle scure
     for i, row_data in enumerate(table_data):
-        for j, val in enumerate(row_data):
+        for j in range(len(row_data)):
             if cell_colors[i][j] == COLOR_SIG:
                 table[i + 1, j].set_text_props(color="white", fontweight="bold")
 
-    # intestazioni
     for j in range(len(col_labels)):
         table[0, j].set_facecolor("#2c3e50")
         table[0, j].set_text_props(color="white", fontweight="bold")
 
     ax.set_title(
         "Friedman test significance per dimension and condition\n"
+        "(dark = significant p<0.05 after Bonferroni correction, light = not significant)",
+        fontweight="bold", fontsize=12, pad=20
+    )
+
+    plt.tight_layout()
+    plt.savefig(filename, dpi=300, bbox_inches="tight")
+    plt.close()
+    print(f"Salvato: {Path(filename).resolve()}")
+
+
+# =========================
+# TABELLA SOLO 2 AGENTI (Raw + Refined)
+# =========================
+
+def plot_significance_table_2agent(df_results_2, filename):
+    fig, ax = plt.subplots(figsize=(10, 5))
+    ax.axis("off")
+
+    table_data = []
+    cell_colors = []
+
+    for dim in DIMENSIONS:
+        row = [dim]
+        colors = ["white"]
+
+        for cond in ["Raw", "Refined"]:
+            sub = df_results_2[(df_results_2["condizione"] == cond) &
+                               (df_results_2["dimensione"] == dim)]
+            if sub.empty:
+                row.append("—")
+                colors.append("#f0f0f0")
+            else:
+                p = sub["p_value_corrected"].values[0]
+                sig = sub["significant"].values[0]
+                row.append(format_pvalue(p))
+                colors.append(COLOR_SIG if sig else COLOR_NOTSIG)
+
+        table_data.append(row)
+        cell_colors.append(colors)
+
+    col_labels = ["Dimension", "Raw", "Refined (2-agent)"]
+    table = ax.table(
+        cellText=table_data,
+        colLabels=col_labels,
+        cellColours=cell_colors,
+        loc="center",
+        cellLoc="center"
+    )
+
+    table.auto_set_font_size(False)
+    table.set_fontsize(11)
+    table.scale(1.2, 1.8)
+
+    for i, row_data in enumerate(table_data):
+        for j in range(len(row_data)):
+            if cell_colors[i][j] == COLOR_SIG:
+                table[i + 1, j].set_text_props(color="white", fontweight="bold")
+
+    for j in range(len(col_labels)):
+        table[0, j].set_facecolor("#2c3e50")
+        table[0, j].set_text_props(color="white", fontweight="bold")
+
+    ax.set_title(
+        "Friedman test significance — Raw vs Refined (2-agent)\n"
         "(dark = significant p<0.05 after Bonferroni correction, light = not significant)",
         fontweight="bold", fontsize=12, pad=20
     )
@@ -187,7 +248,12 @@ plot_barchart(df3, res3, "Final",
               "Final (3-agent)",
               "rq3_barchart_final.png")
 
-# Tabella significatività
-print("\n=== TABELLA ===")
+# Tabella completa
+print("\n=== TABELLA COMPLETA ===")
 plot_significance_table(res2, res3,
                         "rq3_significance_table.png")
+
+# Tabella solo 2 agenti
+print("\n=== TABELLA 2 AGENTI ===")
+plot_significance_table_2agent(res2,
+                               "rq3_significance_table_2agent.png")
