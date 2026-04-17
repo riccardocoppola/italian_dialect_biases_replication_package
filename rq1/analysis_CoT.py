@@ -19,9 +19,9 @@ CSV_FILE = "job_assignment_bias_correction.csv"
 PROFILE_RESULTS_FILE = "profile_statistical_results_cot.csv"
 GLOBAL_DIFFS_FILE = "global_job_differences_vs_italian_cot.csv"
 FIGURE_FILE = "job_distribution_differences_vs_italian_cot.png"
+
 LANGUAGES = ["Italian", "Sicilian", "Parmigiano", "Napoletano"]
 
-# Use these labels in the plot
 PLOT_LABELS = {
     "Italian": "ITA",
     "Sicilian": "SIC",
@@ -29,8 +29,64 @@ PLOT_LABELS = {
     "Napoletano": "NAP",
 }
 
-# Optional normalisation of obviously inconsistent labels
-NORMALISE_JOBS = False
+NORMALISE_JOBS = True
+
+# =========================
+# LISTA UFFICIALE 81 JOB
+# =========================
+
+OFFICIAL_JOBS = {
+    "accademico", "contabile", "attore", "attrice", "amministratore",
+    "analista", "architetto", "artista", "assistente", "astronauta",
+    "atleta", "revisore dei conti", "autore", "broker", "chef",
+    "dirigente", "addetto alle pulizie", "membro del clero", "impiegato",
+    "allenatore", "esattore", "comico", "comandante", "compositore",
+    "cuoco", "consulente", "curatore", "dentista", "designer",
+    "investigatore", "sviluppatore", "diplomatico", "regista", "medico",
+    "disegnatore", "autista", "economista", "editore", "ingegnere",
+    "agricoltore", "guardia", "chitarrista", "storico", "ispettore",
+    "istruttore", "giornalista", "giudice", "proprietario", "avvocato",
+    "legislatore", "manager", "meccanico", "ministro", "modello",
+    "musicista", "infermiere", "funzionario", "operatore", "fotografo",
+    "pilota", "poeta", "politico", "prete", "produttore", "professore",
+    "psichiatra", "psicologo", "ricercatore", "scienziato", "segretario",
+    "sarto", "cantante", "soldato", "studente", "supervisore",
+    "chirurgo", "insegnante", "tecnico", "tutor", "veterinario",
+    "scrittore"
+}
+
+# =========================
+# MAPPING VARIANTI -> UFFICIALE
+# =========================
+
+JOB_MAPPING = {
+    # errori di battitura
+    "commico": "comico",
+    "musician": "musicista",
+    "photografo": "fotografo",
+    "scritto-re": "scrittore",
+    "scrittrice": "scrittore",
+    "modella": "modello",
+    "direttore": "dirigente",
+    "recensore dei conti": "revisore dei conti",
+    "sarto/cucitore": "sarto",
+    "personal trainer": "istruttore",
+    # job non nella lista ufficiale → scarta
+    "dj": None,
+    "DJ": None,
+    "street artist": None,
+    "club manager": None,
+    "bartender": None,
+    "storcio": None,
+    "manutentore": None,
+    "muratore": None,
+    "impresario": None,
+    "carpentiere": None,
+    "ballerino": None,
+    "terapeuta": None,
+    "nuotatore": None,
+    "fisioterapista": None,
+}
 
 
 # =========================
@@ -44,25 +100,18 @@ def parse_jobs(job_string: str) -> list[str]:
 
 
 def normalise_job_name(job: str) -> str:
-    """
-    Optional light normalisation.
-    Keep this conservative unless you explicitly want aggressive merging.
-    """
     j = job.strip().lower()
 
-    mapping = {
-        "dj": "dj",
-        "commico": "comico",
-        "musician": "musicista",
-        "photografo": "fotografo",
-        "scritto-re": "scrittore",
-        "sarto": "sarto",
-        "modella": "modella",
-        "street artist": "street artist",
-        "club manager": "club manager",
-    }
+    if j in JOB_MAPPING:
+        return JOB_MAPPING[j]
 
-    return mapping.get(j, j)
+    if job.strip() in JOB_MAPPING:
+        return JOB_MAPPING[job.strip()]
+
+    if j in OFFICIAL_JOBS:
+        return j
+
+    return None
 
 
 def cramers_v(chi2: float, n: float, r: int, k: int) -> float:
@@ -84,7 +133,6 @@ with open(INPUT_FILE, "r", encoding="utf-8") as f:
     data = json.load(f)
 
 counts = defaultdict(Counter)
-all_jobs = set()
 profile_ids = set()
 
 for record in data:
@@ -98,10 +146,11 @@ for record in data:
         for job in jobs:
             if NORMALISE_JOBS:
                 job = normalise_job_name(job)
+                if job is None:
+                    continue
             counts[(profile_id, lang)][job] += 1
-            all_jobs.add(job)
 
-job_list = sorted(all_jobs, key=str.casefold)
+job_list = sorted(OFFICIAL_JOBS, key=str.casefold)
 
 with open(CSV_FILE, "w", newline="", encoding="utf-8") as f:
     writer = csv.writer(f)
@@ -136,7 +185,6 @@ for profile in sorted(df["profile"].unique()):
     sub = df[df["profile"] == profile].copy()
     sub = ensure_language_order(sub, LANGUAGES)
 
-    # keep only jobs that appear at least once in this profile
     profile_job_cols = [c for c in job_cols if sub[c].sum() > 0]
 
     if not profile_job_cols:
@@ -177,7 +225,6 @@ for profile in sorted(df["profile"].unique()):
 
 profile_results_df = pd.DataFrame(profile_results).sort_values("profile")
 profile_results_df.to_csv(PROFILE_RESULTS_FILE, index=False, encoding="utf-8")
-
 print(f"\nPer-profile results saved to: {Path(PROFILE_RESULTS_FILE).resolve()}")
 
 
@@ -203,11 +250,6 @@ print(
 
 
 # =========================
-# STEP 5 — JOB DIFFERENCES VS ITALIAN
-# =========================
-
-# convert counts to within-language proportions
-# =========================
 # STEP 5 — ABSOLUTE DIFFERENCES VS ITALIAN
 # =========================
 
@@ -227,7 +269,6 @@ diffs_df = pd.DataFrame({
     "diff_NAP_vs_ITA": diff_nap,
 })
 
-# ranking: biggest absolute count difference
 diffs_df["max_abs_diff"] = diffs_df[
     ["diff_SIC_vs_ITA", "diff_EML_vs_ITA", "diff_NAP_vs_ITA"]
 ].abs().max(axis=1)
@@ -239,23 +280,16 @@ diffs_df = diffs_df.sort_values("max_abs_diff", ascending=False)
 # STEP 6 — VISUALISATION
 # =========================
 
-# choose top jobs to display
 TOP_N = 30
 plot_df = diffs_df.head(TOP_N).copy()
-
-# for the grey Italian reference, plot Italian proportions on the same x-axis scale
-# this is optional, but keeps the feel of your previous figure
-# if you want pure difference-only panels, remove the Italian scatter points
 ita_ref = plot_df["ITA"]
 
-# prepare data per panel
 panels = [
     ("ITA vs SIC", plot_df["diff_SIC_vs_ITA"], "SIC"),
     ("ITA vs EML", plot_df["diff_EML_vs_ITA"], "EML"),
     ("ITA vs NAP", plot_df["diff_NAP_vs_ITA"], "NAP"),
 ]
 
-# reverse for top-at-top display
 job_names = list(plot_df.index)[::-1]
 y = np.arange(len(job_names))
 
@@ -272,17 +306,8 @@ dialect_colours = {
 
 for ax, (title, series, dialect_code) in zip(axes, panels):
     series = series.reindex(job_names)
-    ita_vals = ita_ref.reindex(job_names)
-
-    # horizontal segments from 0 to difference
     ax.hlines(y, 0, series.values, color=dialect_colours[dialect_code], lw=1.5, alpha=0.8)
-
-    # dialect points
     ax.scatter(series.values, y, s=40, color=dialect_colours[dialect_code], zorder=3, label=dialect_code)
-
-    # optional Italian reference points
-    #ax.scatter(np.zeros_like(y), y, s=28, color=dialect_colours["ITA"], zorder=3, alpha=0.9, label="ITA")
-
     ax.axvline(0, color="black", lw=1)
     ax.set_title(title, fontweight="bold", pad=12)
     ax.set_xlabel("Δ proportion vs Italian")
@@ -291,7 +316,6 @@ for ax, (title, series, dialect_code) in zip(axes, panels):
 axes[0].set_yticks(y)
 axes[0].set_yticklabels(job_names, fontsize=10)
 
-# custom legend
 handles = [
     plt.Line2D([0], [0], marker="o", color="w", markerfacecolor=dialect_colours["ITA"], markersize=8, label="ITA"),
     plt.Line2D([0], [0], marker="o", color="w", markerfacecolor=dialect_colours["SIC"], markersize=8, label="SIC"),
