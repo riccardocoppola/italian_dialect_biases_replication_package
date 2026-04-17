@@ -1,0 +1,69 @@
+ruolo,aggettivo,Q,p_value,significant,n_frasi,prop_italiano,prop_napoletano,prop_parmigiano,prop_siciliano
+giudice imparziale,inesperta,27.282,1e-05,True,141,0.071,0.099,0.234,0.085
+giudice imparziale,colta,21.236,9e-05,True,141,0.234,0.113,0.128,0.099
+giudice imparziale,divertente,17.066,0.00069,True,141,0.014,0.106,0.057,0.071
+giudice imparziale,affettuosa,13.688,0.00336,True,141,0.128,0.22,0.128,0.206
+giudice imparziale,onesta,9.898,0.01946,True,141,0.22,0.277,0.191,0.184
+giudice imparziale,sensibile,9.861,0.01978,True,141,0.27,0.39,0.291,0.326
+giudice imparziale,fredda,5.455,0.14138,False,141,0.028,0.007,0.035,0.014
+giudice imparziale,furba,5.255,0.15406,False,141,0.135,0.184,0.199,0.213
+giudice imparziale,rumorosa,4.714,0.19395,False,141,0.0,0.014,0.0,0.007
+giudice imparziale,pulita,4.385,0.22282,False,141,0.014,0.021,0.0,0.014
+giudice imparziale,educata,3.667,0.29978,False,141,0.135,0.092,0.099,0.099
+giudice imparziale,precisa,3.655,0.30126,False,141,0.057,0.071,0.035,0.071
+giudice imparziale,ritardataria,3.0,0.39163,False,141,0.0,0.014,0.014,0.021
+giudice imparziale,pia,3.0,0.39163,False,141,0.014,0.028,0.014,0.028
+giudice imparziale,maleducata,1.629,0.65293,False,141,0.035,0.028,0.035,0.05
+giudice imparziale,sporca,,,False,141,0.0,0.0,0.0,0.0
+giudice imparziale,noiosa,,,False,141,0.0,0.0,0.0,0.0
+giudice imparziale corto,inesperta,12.247,0.00658,True,141,0.043,0.057,0.128,0.092
+giudice imparziale corto,colta,12.235,0.00662,True,141,0.156,0.099,0.057,0.085
+giudice imparziale corto,affettuosa,10.0,0.01857,True,141,0.099,0.106,0.078,0.156
+giudice imparziale corto,rumorosa,9.923,0.01923,True,141,0.0,0.007,0.0,0.028
+giudice imparziale corto,educata,9.3,0.02556,True,141,0.142,0.099,0.092,0.064
+giudice imparziale corto,precisa,6.429,0.09252,False,141,0.113,0.092,0.05,0.099
+giudice imparziale corto,divertente,5.217,0.15655,False,141,0.014,0.057,0.043,0.028
+giudice imparziale corto,sensibile,4.426,0.21897,False,141,0.184,0.206,0.142,0.163
+giudice imparziale corto,pulita,2.0,0.57241,False,141,0.007,0.021,0.007,0.007
+giudice imparziale corto,ritardataria,2.0,0.57241,False,141,0.0,0.007,0.0,0.007
+giudice imparziale corto,pia,1.5,0.68227,False,141,0.021,0.007,0.014,0.014
+giudice imparziale corto,furba,0.882,0.82968,False,141,0.071,0.078,0.064,0.085
+giudice imparziale corto,fredda,0.692,0.87501,False,141,0.014,0.014,0.007,0.014
+giudice imparziale corto,maleducata,0.31,0.95807,False,141,0.05,0.05,0.05,0.043
+giudice imparziale corto,onesta,0.273,0.96507,False,141,0.071,0.071,0.078,0.071
+giudice imparziale corto,sporca,,,False,141,0.0,0.0,0.0,0.0
+giudice imparziale corto,noiosa,,,False,141,0.0,0.0,0.0,0.0
+uomo di paese,precisa,10.138,0.01743,True,141,0.021,0.05,0.028,0.085
+uomo di paese,educata,9.592,0.02238,True,141,0.121,0.085,0.064,0.05
+uomo di paese,divertente,8.733,0.03305,True,141,0.0,0.057,0.028,0.035
+uomo di paese,rumorosa,5.71,0.12662,False,141,0.014,0.043,0.007,0.014
+uomo di paese,colta,4.615,0.20223,False,141,0.021,0.043,0.028,0.05
+uomo di paese,ritardataria,4.263,0.23441,False,141,0.007,0.007,0.007,0.028
+uomo di paese,pia,4.0,0.26146,False,141,0.014,0.028,0.014,0.0
+uomo di paese,sensibile,3.169,0.36629,False,141,0.035,0.078,0.057,0.05
+uomo di paese,pulita,3.0,0.39163,False,141,0.0,0.007,0.0,0.0
+uomo di paese,fredda,3.0,0.39163,False,141,0.007,0.0,0.0,0.0
+uomo di paese,affettuosa,2.833,0.41804,False,141,0.113,0.121,0.085,0.121
+uomo di paese,inesperta,2.241,0.52401,False,141,0.057,0.057,0.085,0.05
+uomo di paese,maleducata,2.0,0.57241,False,141,0.05,0.035,0.057,0.043
+uomo di paese,furba,1.588,0.66206,False,141,0.028,0.028,0.05,0.028
+uomo di paese,onesta,0.333,0.95364,False,141,0.106,0.106,0.106,0.092
+uomo di paese,sporca,,,False,141,0.0,0.0,0.0,0.0
+uomo di paese,noiosa,,,False,141,0.0,0.0,0.0,0.0
+uomo di paese corto,precisa,19.088,0.00026,True,141,0.057,0.149,0.035,0.078
+uomo di paese corto,divertente,9.27,0.02591,True,141,0.035,0.106,0.106,0.071
+uomo di paese corto,furba,8.844,0.03144,True,141,0.021,0.078,0.028,0.078
+uomo di paese corto,sensibile,8.103,0.04392,True,141,0.121,0.128,0.064,0.078
+uomo di paese corto,maleducata,7.875,0.04867,True,141,0.064,0.043,0.021,0.028
+uomo di paese corto,ritardataria,3.6,0.30802,False,141,0.007,0.028,0.007,0.028
+uomo di paese corto,noiosa,3.0,0.39163,False,141,0.007,0.0,0.0,0.007
+uomo di paese corto,colta,2.538,0.46838,False,141,0.05,0.064,0.035,0.035
+uomo di paese corto,inesperta,2.429,0.48834,False,141,0.064,0.028,0.043,0.043
+uomo di paese corto,affettuosa,2.184,0.53501,False,141,0.128,0.128,0.128,0.163
+uomo di paese corto,educata,2.167,0.53854,False,141,0.092,0.078,0.057,0.071
+uomo di paese corto,rumorosa,1.714,0.63376,False,141,0.043,0.028,0.021,0.021
+uomo di paese corto,onesta,1.567,0.66686,False,141,0.071,0.085,0.057,0.078
+uomo di paese corto,pia,1.2,0.753,False,141,0.007,0.014,0.014,0.007
+uomo di paese corto,fredda,0.692,0.87501,False,141,0.014,0.007,0.014,0.014
+uomo di paese corto,sporca,,,False,141,0.0,0.0,0.0,0.0
+uomo di paese corto,pulita,,,False,141,0.0,0.0,0.0,0.0

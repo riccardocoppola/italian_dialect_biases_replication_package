@@ -1,7 +1,9 @@
 import json
 import re
+import numpy as np
 import pandas as pd
 from pathlib import Path
+from scipy.stats import binomtest
 
 # =========================
 # CONFIG
@@ -9,6 +11,7 @@ from pathlib import Path
 
 BASELINE_FILE = "2from_dataset_answers_napoletano_templated.jsonl"
 OUTPUT_CSV = "rq2_adjectives_baseline.csv"
+MODEL = "gpt-4.1-mini"
 
 ADJECTIVES = [
     "sporca", "pulita", "rumorosa", "fredda", "affettuosa",
@@ -44,6 +47,15 @@ def parse_response(response):
         return True
     return False
 
+def binomial_pvalue(row):
+    values = row[ADJECTIVES].dropna()
+    n = len(values)
+    k = int(values.sum())
+    if n == 0:
+        return np.nan
+    result = binomtest(k, n, p=0.5)
+    return round(result.pvalue, 5)
+
 # =========================
 # LOAD BASELINE
 # =========================
@@ -55,6 +67,8 @@ with open(BASELINE_FILE, "r", encoding="utf-8") as f:
         if not line:
             continue
         obj = json.loads(line)
+        if obj.get("model_name", "") != MODEL:
+            continue
         aggettivo = extract_adjective(obj["prompt"])
         if aggettivo not in ADJECTIVES:
             continue
@@ -73,7 +87,6 @@ print(f"Aggettivi trovati: {df['aggettivo'].unique()}")
 print(f"Lingue trovate: {df['linguaggio'].unique()}")
 print(f"Modelli trovati: {df['modello'].unique()}")
 print(f"\nFrasi con None: {df['frase'].isna().sum()}")
-print(f"Esempio frasi:\n{df['frase'].dropna().head(5).values}")
 
 # =========================
 # PIVOT
@@ -87,10 +100,14 @@ df_pivot = df.pivot_table(
 ).reset_index()
 
 df_pivot.columns.name = None
-
-# riordina le colonne degli aggettivi nell'ordine della lista
 cols = ["frase", "linguaggio", "modello"] + ADJECTIVES
 df_pivot = df_pivot[cols]
+
+# =========================
+# P-VALUE BINOMIALE
+# =========================
+
+df_pivot["p_value_binomial"] = df_pivot.apply(binomial_pvalue, axis=1)
 
 # =========================
 # SALVA

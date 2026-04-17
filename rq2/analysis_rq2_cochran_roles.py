@@ -7,9 +7,9 @@ from pathlib import Path
 # CONFIG
 # =========================
 
-INPUT_CSV = "rq2_adjectives_baseline.csv"
+INPUT_CSV = "rq2_adjectives_roles.csv"
 MAPPING_CSV = "all_dialects_traslated.csv"
-OUTPUT_CSV = "rq2_cochran_baseline_results.csv"
+OUTPUT_CSV = "rq2_cochran_roles_results.csv"
 MODEL = "gpt-4.1-mini"
 
 ADJECTIVES = [
@@ -20,6 +20,13 @@ ADJECTIVES = [
 ]
 
 LANGUAGES = ["italiano", "napoletano", "parmigiano", "siciliano"]
+
+ROLES = [
+    "giudice imparziale",
+    "giudice imparziale corto",
+    "uomo di paese",
+    "uomo di paese corto"
+]
 
 # =========================
 # COCHRAN'S Q TEST
@@ -75,46 +82,51 @@ print(f"Frasi senza ID: {df['frase_id'].isna().sum()}")
 df = df[df["frase_id"].notna()]
 
 # =========================
-# TEST PER OGNI AGGETTIVO
+# TEST PER OGNI RUOLO E AGGETTIVO
 # =========================
 
 results = []
 
-for aggettivo in ADJECTIVES:
-    try:
-        pivot = df.pivot_table(
-            index="frase_id",
-            columns="linguaggio",
-            values=aggettivo,
-            aggfunc="first"
-        )
+for ruolo in ROLES:
+    df_role = df[df["ruolo"] == ruolo]
+    print(f"\nRuolo: {ruolo} — righe: {len(df_role)}")
 
-        pivot = pivot.reindex(columns=LANGUAGES).dropna()
+    for aggettivo in ADJECTIVES:
+        try:
+            pivot = df_role.pivot_table(
+                index="frase_id",
+                columns="linguaggio",
+                values=aggettivo,
+                aggfunc="first"
+            )
 
-        if len(pivot) < 2:
-            print(f"Skipped {aggettivo}: frasi complete insufficienti ({len(pivot)})")
-            continue
+            pivot = pivot.reindex(columns=LANGUAGES).dropna()
 
-        Q, p = cochran_q(pivot.values)
-        props = pivot.mean()
+            if len(pivot) < 2:
+                print(f"  Skipped {aggettivo}: frasi insufficienti ({len(pivot)})")
+                continue
 
-        results.append({
-            "aggettivo": aggettivo,
-            "Q": round(Q, 3),
-            "p_value": round(p, 5),
-            "significant": p < 0.05,
-            "n_frasi": len(pivot),
-            **{f"prop_{lang}": round(props[lang], 3) for lang in LANGUAGES}
-        })
+            Q, p = cochran_q(pivot.values)
+            props = pivot.mean()
 
-    except Exception as e:
-        print(f"Errore {aggettivo}: {e}")
+            results.append({
+                "ruolo": ruolo,
+                "aggettivo": aggettivo,
+                "Q": round(Q, 3),
+                "p_value": round(p, 5),
+                "significant": p < 0.05,
+                "n_frasi": len(pivot),
+                **{f"prop_{lang}": round(props[lang], 3) for lang in LANGUAGES}
+            })
+
+        except Exception as e:
+            print(f"  Errore {aggettivo}: {e}")
 
 # =========================
 # SALVA RISULTATI
 # =========================
 
-results_df = pd.DataFrame(results).sort_values("p_value")
+results_df = pd.DataFrame(results).sort_values(["ruolo", "p_value"])
 results_df.to_csv(OUTPUT_CSV, index=False, encoding="utf-8")
 
 print(f"\nRisultati salvati: {Path(OUTPUT_CSV).resolve()}")

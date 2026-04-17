@@ -1,7 +1,9 @@
 import json
 import re
+import numpy as np
 import pandas as pd
 from pathlib import Path
+from scipy.stats import binomtest
 
 # =========================
 # CONFIG
@@ -9,6 +11,7 @@ from pathlib import Path
 
 ROLE_FILE = "results_role_prompting.jsonl"
 OUTPUT_CSV = "rq2_adjectives_roles.csv"
+MODEL = "gpt-4.1-mini"
 
 ADJECTIVES = [
     "sporca", "pulita", "rumorosa", "fredda", "affettuosa",
@@ -44,6 +47,15 @@ def parse_response(response):
         return True
     return False
 
+def binomial_pvalue(row):
+    values = row[ADJECTIVES].dropna()
+    n = len(values)
+    k = int(values.sum())
+    if n == 0:
+        return np.nan
+    result = binomtest(k, n, p=0.5)
+    return round(result.pvalue, 5)
+
 # =========================
 # LOAD ROLE PROMPTING
 # =========================
@@ -55,6 +67,8 @@ with open(ROLE_FILE, "r", encoding="utf-8") as f:
         if not line:
             continue
         obj = json.loads(line)
+        if obj.get("model_name", "") != MODEL:
+            continue
         aggettivo = extract_adjective(obj["prompt"])
         if aggettivo not in ADJECTIVES:
             continue
@@ -88,10 +102,14 @@ df_pivot = df.pivot_table(
 ).reset_index()
 
 df_pivot.columns.name = None
-
-# riordina le colonne degli aggettivi nell'ordine della lista
 cols = ["frase", "linguaggio", "ruolo", "modello"] + ADJECTIVES
 df_pivot = df_pivot[cols]
+
+# =========================
+# P-VALUE BINOMIALE
+# =========================
+
+df_pivot["p_value_binomial"] = df_pivot.apply(binomial_pvalue, axis=1)
 
 # =========================
 # SALVA
