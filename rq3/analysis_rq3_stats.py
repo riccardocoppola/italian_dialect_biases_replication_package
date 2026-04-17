@@ -23,6 +23,8 @@ DIMENSIONS = [
 
 LANGUAGES = ["Napoletano", "Italiano (Auto)", "Parmigiano", "Siciliano"]
 
+N_COMPARISONS = len(DIMENSIONS)  # 6 — per correzione Bonferroni
+
 # =========================
 # FRIEDMAN TEST
 # =========================
@@ -33,13 +35,15 @@ def run_friedman(df, suffixes, label):
 
     for suffix in suffixes:
         print(f"\n-- {suffix} --")
+        
+        # prima passata: calcola tutti i p-value grezzi
+        raw_results = []
         for dim in DIMENSIONS:
             col = f"{dim}_{suffix}"
             if col not in df.columns:
                 print(f"  Colonna {col} non trovata")
                 continue
 
-            # pivot: righe = frasi (Original_Row), colonne = lingue
             pivot = df.pivot_table(
                 index="Original_Row",
                 columns="Language",
@@ -56,19 +60,29 @@ def run_friedman(df, suffixes, label):
             groups = [pivot[lang].values for lang in LANGUAGES]
             stat, p = friedmanchisquare(*groups)
 
-            results.append({
+            raw_results.append({
                 "condizione": suffix,
                 "dimensione": dim,
                 "statistica": round(stat, 3),
-                "p_value": round(p, 5),
-                "significant": p < 0.05,
+                "p_value_raw": p,
                 "n_frasi": len(pivot),
                 **{f"mean_{lang.replace(' ', '_').replace('(', '').replace(')', '')}":
                    round(pivot[lang].mean(), 3) for lang in LANGUAGES}
             })
 
-            sig = "✓" if p < 0.05 else ""
-            print(f"  {dim}: stat={stat:.3f}, p={p:.5f} {sig}")
+        # seconda passata: applica correzione Bonferroni
+        for r in raw_results:
+            p_corrected = min(r["p_value_raw"] * N_COMPARISONS, 1.0)
+            r["p_value_corrected"] = round(p_corrected, 5)
+            r["p_value_raw"] = round(r["p_value_raw"], 5)
+            r["significant"] = p_corrected < 0.05
+
+            sig = "✓" if r["significant"] else ""
+            print(f"  {r['dimensione']}: stat={r['statistica']:.3f}, "
+                  f"p_raw={r['p_value_raw']:.5f}, "
+                  f"p_corrected={r['p_value_corrected']:.5f} {sig}")
+
+            results.append(r)
 
     return pd.DataFrame(results)
 

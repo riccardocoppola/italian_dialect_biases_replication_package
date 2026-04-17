@@ -1,7 +1,6 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib.colors as mcolors
 from pathlib import Path
 
 # =========================
@@ -31,6 +30,23 @@ COLOURS = {
     "Parmigiano": "#e67e22",
     "Siciliano": "#3498db"
 }
+
+# =========================
+# HELPER — formato p-value con esponente
+# =========================
+
+def format_pvalue(p):
+    if p >= 1.0:
+        return "p=1.000"
+    if p == 0.0 or p < 1e-10:
+        return "p<10⁻¹⁰"
+    if p >= 0.001:
+        return f"p={p:.4f}"
+    else:
+        exp = int(np.floor(np.log10(p)))
+        base = p / (10 ** exp)
+        return f"p={base:.2f}×10⁻{abs(exp)}"
+
 
 # =========================
 # OPZIONE B — BAR CHART PER DIMENSIONE SIGNIFICATIVA
@@ -82,13 +98,15 @@ def plot_barchart(df_data, df_results, suffix, condition_label, filename):
 # =========================
 
 def plot_significance_table(df_results_2, df_results_3, filename):
-    conditions = ["Raw", "Refined", "Final"]
-    fig, ax = plt.subplots(figsize=(10, 5))
+    fig, ax = plt.subplots(figsize=(12, 5))
     ax.axis("off")
 
-    # costruisci tabella
     table_data = []
     cell_colors = []
+
+    # colori bianco/nero friendly
+    COLOR_SIG = "#2c3e50"      # blu scuro per significativo
+    COLOR_NOTSIG = "#ecf0f1"   # grigio chiaro per non significativo
 
     for dim in DIMENSIONS:
         row = [dim]
@@ -102,15 +120,15 @@ def plot_significance_table(df_results_2, df_results_3, filename):
                 row.append("—")
                 colors.append("#f0f0f0")
             else:
-                p = sub["p_value"].values[0]
+                p = sub["p_value_corrected"].values[0]
                 sig = sub["significant"].values[0]
-                row.append(f"p={p:.4f}")
-                colors.append("#f1948a" if sig else "#a9dfbf")
+                row.append(format_pvalue(p))
+                colors.append(COLOR_SIG if sig else COLOR_NOTSIG)
 
         table_data.append(row)
         cell_colors.append(colors)
 
-    col_labels = ["Dimensione", "Raw", "Refined (2-agent)", "Final (3-agent)"]
+    col_labels = ["Dimension", "Raw", "Refined (2-agent)", "Final (3-agent)"]
     table = ax.table(
         cellText=table_data,
         colLabels=col_labels,
@@ -123,14 +141,22 @@ def plot_significance_table(df_results_2, df_results_3, filename):
     table.set_fontsize(11)
     table.scale(1.2, 1.8)
 
-    # intestazioni in grassetto
+    # testo bianco per celle scure
+    for i, row_data in enumerate(table_data):
+        for j, val in enumerate(row_data):
+            if cell_colors[i][j] == COLOR_SIG:
+                table[i + 1, j].set_text_props(color="white", fontweight="bold")
+
+    # intestazioni
     for j in range(len(col_labels)):
         table[0, j].set_facecolor("#2c3e50")
         table[0, j].set_text_props(color="white", fontweight="bold")
 
-    ax.set_title("Significatività Friedman test per dimensione e condizione\n"
-                 "(rosso = significativo p<0.05, verde = non significativo)",
-                 fontweight="bold", fontsize=12, pad=20)
+    ax.set_title(
+        "Friedman test significance per dimension and condition\n"
+        "(dark = significant p<0.05 after Bonferroni correction, light = not significant)",
+        fontweight="bold", fontsize=12, pad=20
+    )
 
     plt.tight_layout()
     plt.savefig(filename, dpi=300, bbox_inches="tight")
