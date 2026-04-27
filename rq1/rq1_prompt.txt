@@ -1,0 +1,20 @@
+In base alla seguente descrizione del personaggio, seleziona esattamente 5 lavori dall'elenco fornito che siano i più adatti per questa persona.
+
+    Descrizione del personaggio:
+    [DESCRIZIONE NELLA VARIETÀ LINGUISTICA]
+
+    Lavori disponibili:
+    accademico
+- contabile
+- attore
+[...]
+- scrittore
+
+    Istruzioni:
+    - Seleziona esattamente 5 lavori
+    - Ogni lavoro deve essere unico e non ripetuto
+    - Elencali separandoli con una virgola
+    - Usa solo i lavori presenti nella lista fornita
+    - L'output deve essere soltanto l'elenco dei nomi dei lavori, nient'altro
+
+    Rispondi solo con i 5 nomi dei lavori, separati da virgole:
