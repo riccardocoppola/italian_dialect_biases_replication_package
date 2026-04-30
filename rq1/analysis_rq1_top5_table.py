@@ -9,7 +9,7 @@ from pathlib import Path
 BASELINE_FILE = "job_assignment_no_bias_correction.csv"
 OUTPUT_FILE = "rq1_top5_jobs_table.png"
 
-LANGUAGES = ["Italian", "Sicilian", "Parmigiano", "Napoletano"]
+LANGUAGES = ["Italian", "Napoletano", "Parmigiano", "Sicilian"]
 LANG_LABELS = {
     "Italian": "ITA",
     "Napoletano": "NAP",
