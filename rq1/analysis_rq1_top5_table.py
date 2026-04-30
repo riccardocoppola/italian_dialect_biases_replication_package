@@ -12,9 +12,10 @@ OUTPUT_FILE = "rq1_top5_jobs_table.png"
 LANGUAGES = ["Italian", "Sicilian", "Parmigiano", "Napoletano"]
 LANG_LABELS = {
     "Italian": "ITA",
+    "Napoletano": "NAP",
+    "Parmigiano": "PAR",
     "Sicilian": "SIC",
-    "Parmigiano": "EML",
-    "Napoletano": "NAP"
+    
 }
 
 # =========================

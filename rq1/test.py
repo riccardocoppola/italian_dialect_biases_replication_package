@@ -10,7 +10,7 @@ DISCARDED = {"dj", "DJ", "street artist", "club manager", "bartender",
 
 count = 0
 for record in data:
-    for lang in ["Italian", "Sicilian", "Parmigiano", "Napoletano"]:
+    for lang in ["Italian", "Napoletano", "Parmigiano", "Sicilian"]:
         jobs = [j.strip() for j in record.get(f"jobs_{lang}", "").split(",")]
         count += sum(1 for j in jobs if j in DISCARDED)
 

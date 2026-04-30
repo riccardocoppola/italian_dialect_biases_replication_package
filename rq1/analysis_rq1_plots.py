@@ -8,31 +8,32 @@ from pathlib import Path
 # =========================
 
 BASELINE_FILE = "job_assignment_no_bias_correction_with_deltas.csv"
-COT_FILE = "job_assignment_bias_correction_with_deltas.csv"
 
-LANGUAGES = ["Italian", "Sicilian", "Parmigiano", "Napoletano"]
+LANGUAGES = ["Italian", "Napoletano", "Parmigiano", "Sicilian"]
 LANG_LABELS = {
     "Italian": "ITA",
+    "Napoletano": "NAP",
+    "Parmigiano": "PAR",
     "Sicilian": "SIC",
-    "Parmigiano": "EML",
-    "Napoletano": "NAP"
 }
 COLOURS = {
     "Italian": "#95a5a6",
-    "Sicilian": "#3498db",
+    "Napoletano": "#2ecc71",
     "Parmigiano": "#e67e22",
-    "Napoletano": "#2ecc71"
+    "Sicilian": "#3498db"
+    
+
 }
-DIALECTS = ["Sicilian", "Parmigiano", "Napoletano"]
+DIALECTS = ["Napoletano", "Parmigiano", "Sicilian"]
 DELTA_COLOURS = {
-    "delta_SIC": "#3498db",
-    "delta_EML": "#e67e22",
-    "delta_NAP": "#2ecc71"
+    "delta_NAP": "#2ecc71",
+    "delta_PAR": "#e67e22",
+    "delta_SIC": "#3498db"
 }
 DELTA_LABELS = {
-    "delta_SIC": "SIC-ITA",
-    "delta_EML": "EML-ITA",
-    "delta_NAP": "NAP-ITA"
+    "delta_NAP": "NAP-ITA",
+    "delta_PAR": "PAR-ITA",
+    "delta_SIC": "SIC-ITA"
 }
 TOP_N = 5
 
@@ -139,7 +140,7 @@ def plot_boxplot_per_profile(df, condition_label):
 
     for profile in get_profiles(df):
         sub_delta = df[(df["profile"] == profile) &
-                       (df["language"].isin(["delta_SIC", "delta_EML", "delta_NAP"]))]
+                       (df["language"].isin(["delta_NAP", "delta_PAR", "delta_SIC"]))]
 
         if sub_delta.empty:
             continue
@@ -148,7 +149,7 @@ def plot_boxplot_per_profile(df, condition_label):
         labels = []
         colors = []
 
-        for delta_label in ["delta_SIC", "delta_EML", "delta_NAP"]:
+        for delta_label in ["delta_NAP", "delta_SIC", "delta_PAR"]:
             row = sub_delta[sub_delta["language"] == delta_label]
             if row.empty:
                 continue
@@ -181,14 +182,8 @@ def plot_boxplot_per_profile(df, condition_label):
         plt.close()
         print(f"Salvato: {Path(filename).resolve()}")
 
-
-# =========================
-# MAIN
-# =========================
-
-for label, filepath in [("BASELINE", BASELINE_FILE), ("COT", COT_FILE)]:
-    print(f"\n=== {label} ===")
-    df = pd.read_csv(filepath)
-    plot_bar_top5_diff(df, label)
-    plot_bar_all_jobs(df, label)
-    plot_boxplot_per_profile(df, label)
+print("=== BASELINE ===")
+df = pd.read_csv(BASELINE_FILE)
+plot_bar_top5_diff(df, "BASELINE")
+plot_bar_all_jobs(df, "BASELINE")
+plot_boxplot_per_profile(df, "BASELINE")

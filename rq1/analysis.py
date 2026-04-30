@@ -19,13 +19,15 @@ PROFILE_RESULTS_FILE = "profile_statistical_results.csv"
 GLOBAL_DIFFS_FILE = "global_job_differences_vs_italian.csv"
 FIGURE_FILE = "job_distribution_differences_vs_italian.png"
 
-LANGUAGES = ["Italian", "Sicilian", "Parmigiano", "Napoletano"]
+LANGUAGES = ["Italian", "Napoletano", "Parmigiano", "Sicilian"]
 
 PLOT_LABELS = {
     "Italian": "ITA",
-    "Sicilian": "SIC",
-    "Parmigiano": "EML",
     "Napoletano": "NAP",
+    "Parmigiano": "PAR",
+    "Sicilian": "SIC"
+    
+    
 }
 
 NORMALISE_JOBS = True
@@ -259,22 +261,27 @@ print(
 
 global_counts = df.groupby("language")[job_cols].sum().reindex(LANGUAGES)
 
-diff_sic = global_counts.loc["Sicilian"] - global_counts.loc["Italian"]
-diff_par = global_counts.loc["Parmigiano"] - global_counts.loc["Italian"]
+
 diff_nap = global_counts.loc["Napoletano"] - global_counts.loc["Italian"]
+diff_par = global_counts.loc["Parmigiano"] - global_counts.loc["Italian"]
+diff_sic = global_counts.loc["Sicilian"] - global_counts.loc["Italian"]
+
 
 diffs_df = pd.DataFrame({
     "ITA": global_counts.loc["Italian"],
-    "SIC": global_counts.loc["Sicilian"],
-    "EML": global_counts.loc["Parmigiano"],
     "NAP": global_counts.loc["Napoletano"],
-    "diff_SIC_vs_ITA": diff_sic,
-    "diff_EML_vs_ITA": diff_par,
+    "PAR": global_counts.loc["Parmigiano"],
+    "SIC": global_counts.loc["Sicilian"],
+    
     "diff_NAP_vs_ITA": diff_nap,
+    "diff_PAR_vs_ITA": diff_par,
+    "diff_SIC_vs_ITA": diff_sic,
+    
+    
 })
 
 diffs_df["max_abs_diff"] = diffs_df[
-    ["diff_SIC_vs_ITA", "diff_EML_vs_ITA", "diff_NAP_vs_ITA"]
+    ["diff_NAP_vs_ITA", "diff_PAR_vs_ITA", "diff_SIC_vs_ITA"]
 ].abs().max(axis=1)
 
 diffs_df = diffs_df.sort_values("max_abs_diff", ascending=False)
@@ -289,9 +296,10 @@ plot_df = diffs_df.head(TOP_N).copy()
 ita_ref = plot_df["ITA"]
 
 panels = [
-    ("ITA vs SIC", plot_df["diff_SIC_vs_ITA"], "SIC"),
-    ("ITA vs EML", plot_df["diff_EML_vs_ITA"], "EML"),
+   
     ("ITA vs NAP", plot_df["diff_NAP_vs_ITA"], "NAP"),
+    ("ITA vs PAR", plot_df["diff_PAR_vs_ITA"], "PAR"),
+    ("ITA vs SIC", plot_df["diff_SIC_vs_ITA"], "SIC")
 ]
 
 job_names = list(plot_df.index)[::-1]
@@ -303,9 +311,10 @@ fig.suptitle("Occupational Distribution Differences: Dialects vs. Standard Itali
 
 dialect_colours = {
     "ITA": "#95a5a6",
-    "SIC": "#3498db",
-    "EML": "#e67e22",
     "NAP": "#2ecc71",
+    "PAR": "#e67e22",
+    "SIC": "#3498db",
+    
 }
 
 for ax, (title, series, dialect_code) in zip(axes, panels):
@@ -323,7 +332,7 @@ axes[0].set_yticklabels(job_names, fontsize=10)
 handles = [
     plt.Line2D([0], [0], marker="o", color="w", markerfacecolor=dialect_colours["ITA"], markersize=8, label="ITA"),
     plt.Line2D([0], [0], marker="o", color="w", markerfacecolor=dialect_colours["SIC"], markersize=8, label="SIC"),
-    plt.Line2D([0], [0], marker="o", color="w", markerfacecolor=dialect_colours["EML"], markersize=8, label="EML"),
+    plt.Line2D([0], [0], marker="o", color="w", markerfacecolor=dialect_colours["PAR"], markersize=8, label="PAR"),
     plt.Line2D([0], [0], marker="o", color="w", markerfacecolor=dialect_colours["NAP"], markersize=8, label="NAP"),
 ]
 fig.legend(handles=handles, loc="upper center", ncol=4, frameon=False, bbox_to_anchor=(0.5, 0.945))

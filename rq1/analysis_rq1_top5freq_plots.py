@@ -8,15 +8,16 @@ CSV_FILE = "job_assignment_no_bias_correction.csv"
 LANGUAGES = ["Italian", "Sicilian", "Parmigiano", "Napoletano"]
 LANG_LABELS = {
     "Italian": "ITA",
-    "Sicilian": "SIC",
-    "Parmigiano": "EML",
-    "Napoletano": "NAP"
+    "Napoletano": "NAP",
+    "Parmigiano": "PAR",
+    "Sicilian": "SIC"
+    
 }
 COLOURS = {
     "Italian": "#95a5a6",
-    "Sicilian": "#3498db",
+    "Napoletano": "#2ecc71",
     "Parmigiano": "#e67e22",
-    "Napoletano": "#2ecc71"
+    "Sicilian": "#3498db"
 }
 
 df = pd.read_csv(CSV_FILE)

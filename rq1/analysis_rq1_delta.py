@@ -7,10 +7,8 @@ from pathlib import Path
 # =========================
 
 BASELINE_FILE = "job_assignment_no_bias_correction.csv"
-COT_FILE = "job_assignment_bias_correction.csv"
 
 OUTPUT_BASELINE = "job_assignment_no_bias_correction_with_deltas.csv"
-OUTPUT_COT = "job_assignment_bias_correction_with_deltas.csv"
 
 # =========================
 # MAIN
@@ -33,7 +31,7 @@ def process(input_file, output_file):
 
         ita = sub.loc["Italian", job_cols]
 
-        for dialect, label in [("Sicilian", "delta_SIC"), ("Parmigiano", "delta_EML"), ("Napoletano", "delta_NAP")]:
+        for dialect, label in [("Napoletano", "delta_NAP"), ("Parmigiano", "delta_PAR"), ("Sicilian", "delta_SIC")]:
             if dialect not in sub.index:
                 continue
             dial = sub.loc[dialect, job_cols]
@@ -48,7 +46,7 @@ def process(input_file, output_file):
     # STEP 3 — media dei 5 delta per confronto
     # =========================
     mean_rows = []
-    for label in ["delta_SIC", "delta_EML", "delta_NAP"]:
+    for label in ["delta_NAP", "delta_PAR", "delta_SIC"]:
         sub = df_deltas[df_deltas["language"] == label][job_cols]
         mean = sub.mean()
         row = {"profile": "mean", "language": f"mean_{label}"}
@@ -61,7 +59,7 @@ def process(input_file, output_file):
     # STEP 4 — media di tutti i job per ogni mean_delta
     # =========================
     global_mean_rows = []
-    for label in ["mean_delta_SIC", "mean_delta_EML", "mean_delta_NAP"]:
+    for label in ["mean_delta_NAP", "mean_delta_PAR", "mean_delta_SIC"]:
         sub = df_means[df_means["language"] == label][job_cols]
         global_mean = sub.mean(axis=1).values[0]
         row = {"profile": "global_mean", "language": f"global_{label}"}
@@ -93,6 +91,3 @@ def process(input_file, output_file):
 
 print("=== BASELINE ===")
 process(BASELINE_FILE, OUTPUT_BASELINE)
-
-print("\n=== COT ===")
-process(COT_FILE, OUTPUT_COT)
