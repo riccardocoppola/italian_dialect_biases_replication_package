@@ -11,7 +11,6 @@ LANG_LABELS = {
     "Napoletano": "NAP",
     "Parmigiano": "PAR",
     "Sicilian": "SIC"
-    
 }
 COLOURS = {
     "Italian": "#95a5a6",
@@ -20,15 +19,52 @@ COLOURS = {
     "Sicilian": "#3498db"
 }
 
+JOB_TRANSLATIONS = {
+    "meccanico": "mechanic",
+    "agricoltore": "farmer",
+    "autista": "driver",
+    "supervisore": "supervisor",
+    "operatore": "operator",
+    "assistente": "assistant",
+    "allenatore": "coach",
+    "atleta": "athlete",
+    "attore": "actor",
+    "modello": "model",
+    "pilota": "pilot",
+    "istruttore": "instructor",
+    "attrice": "actress",
+    "musicista": "musician",
+    "cuoco": "cook",
+    "fotografo": "photographer",
+    "scrittore": "writer",
+    "chef": "chef",
+    "artista": "artist",
+    "consulente": "consultant",
+    "professore": "professor",
+    "storico": "historian",
+    "manager": "manager",
+    "amministratore": "administrator",
+    "comico": "comedian",
+    "modella": "model",
+    "dirigente": "executive",
+    "revisore dei conti": "auditor",
+    "addetto alle pulizie": "cleaner",
+    "cantante": "singer",
+    "regista": "director",
+    "investigatore": "investigator",
+    "soldato": "soldier",
+    "comandante": "commander",
+}
+
 df = pd.read_csv(CSV_FILE)
 job_cols = [c for c in df.columns if c not in ["profile", "language"]]
 
 for profile in sorted(df["profile"].unique()):
     sub = df[df["profile"] == profile]
 
-    # top 5 job per media su tutte le varietà
     mean_counts = sub[job_cols].mean()
     top5_jobs = mean_counts.sort_values(ascending=False).head(5).index.tolist()
+    top5_labels = [JOB_TRANSLATIONS.get(j, j) for j in top5_jobs]
 
     x = np.arange(5)
     width = 0.2
@@ -49,7 +85,7 @@ for profile in sorted(df["profile"].unique()):
                alpha=0.85)
 
     ax.set_xticks(x)
-    ax.set_xticklabels(top5_jobs, rotation=15, ha="right", fontsize=10)
+    ax.set_xticklabels(top5_labels, rotation=15, ha="right", fontsize=10)
     ax.set_ylabel("Frequency (out of 30 runs)")
     ax.set_title(f"Top 5 most assigned jobs — Profile {profile}",
                  fontweight="bold", fontsize=13)
