@@ -8,7 +8,6 @@ from pathlib import Path
 # =========================
 
 FILE_2AGENT = "risultati_analisi_completi_2agent.csv"
-FILE_3AGENT = "risultati_finali_multiagente_3agent.csv"
 
 DIMENSIONS = [
     "Coscienzioso",
@@ -19,22 +18,35 @@ DIMENSIONS = [
     "Istruito"
 ]
 
-LANGUAGES = ["Napoletano", "Italiano (Auto)", "Parmigiano", "Siciliano"]
+DIMENSION_LABELS = {
+    "Coscienzioso": "Conscientious",
+    "Mentalita_aperta": "Open-minded",
+    "Amichevole": "Friendly",
+    "Urbano": "Urban",
+    "Calmo": "Calm",
+    "Istruito": "Educated"
+}
+
+LANGUAGES = ["Italiano (Auto)", "Napoletano", "Parmigiano", "Siciliano"]
+LANG_LABELS = {
+    "Italiano (Auto)": "ITA",
+    "Napoletano": "NAP",
+    "Parmigiano": "PAR",
+    "Siciliano": "SIC"
+}
+
+COLOURS = {
+    "Italiano (Auto)": "#95a5a6",
+    "Napoletano": "#2ecc71",
+    "Parmigiano": "#e67e22",
+    "Siciliano": "#3498db"
+}
 
 # =========================
 # LOAD DATA
 # =========================
 
 df2 = pd.read_csv(FILE_2AGENT)
-df3 = pd.read_csv(FILE_3AGENT)
-
-print("=== 2 AGENTI ===")
-print(f"Righe: {len(df2)}, Colonne: {list(df2.columns)}")
-print(f"Lingue: {df2['Language'].unique()}")
-
-print("\n=== 3 AGENTI ===")
-print(f"Righe: {len(df3)}, Colonne: {list(df3.columns)}")
-print(f"Lingue: {df3['Language'].unique()}")
 
 # =========================
 # MEDIE PER LINGUA E DIMENSIONE
@@ -42,7 +54,7 @@ print(f"Lingue: {df3['Language'].unique()}")
 
 def compute_means(df, suffix):
     results = {}
-    for lang in df["Language"].unique():
+    for lang in LANGUAGES:
         sub = df[df["Language"] == lang]
         results[lang] = {}
         for dim in DIMENSIONS:
@@ -53,50 +65,34 @@ def compute_means(df, suffix):
 
 means2_raw     = compute_means(df2, "Raw")
 means2_refined = compute_means(df2, "Refined")
-means3_raw     = compute_means(df3, "Raw")
-means3_final   = compute_means(df3, "Final")
-
-print("\n=== MEDIE 2 AGENTI - RAW ===")
-print(means2_raw)
-print("\n=== MEDIE 2 AGENTI - REFINED ===")
-print(means2_refined)
-print("\n=== MEDIE 3 AGENTI - RAW ===")
-print(means3_raw)
-print("\n=== MEDIE 3 AGENTI - FINAL ===")
-print(means3_final)
 
 # =========================
 # RADAR PLOT
 # =========================
 
 def radar_plot(means_raw, means_corrected, title, filename, label_corrected):
-    categories = DIMENSIONS
+    categories = [DIMENSION_LABELS[d] for d in DIMENSIONS]
     N = len(categories)
     angles = [n / float(N) * 2 * np.pi for n in range(N)]
     angles += angles[:1]
-
-    colors = {
-        "Napoletano": "#3498db",
-        "Italiano (Auto)": "#95a5a6",
-        "Parmigiano": "#e67e22",
-        "Siciliano": "#2ecc71"
-    }
 
     fig, axes = plt.subplots(1, 2, figsize=(16, 7),
                              subplot_kw=dict(polar=True))
     fig.suptitle(title, fontsize=16, fontweight="bold", y=1.02)
 
     for ax, (means, label) in zip(axes, [
-        (means_raw, "Raw (Agent 1)"),
+        (means_raw, "Raw"),
         (means_corrected, label_corrected)
     ]):
-        for lang in means.index:
+        for lang in LANGUAGES:
+            if lang not in means.index:
+                continue
             values = means.loc[lang, DIMENSIONS].tolist()
             values += values[:1]
-            color = colors.get(lang, "black")
             ax.plot(angles, values, "o-", linewidth=2,
-                    label=lang, color=color)
-            ax.fill(angles, values, alpha=0.1, color=color)
+                    label=LANG_LABELS[lang],
+                    color=COLOURS[lang])
+            ax.fill(angles, values, alpha=0.1, color=COLOURS[lang])
 
         ax.set_xticks(angles[:-1])
         ax.set_xticklabels(categories, size=10)
@@ -109,12 +105,12 @@ def radar_plot(means_raw, means_corrected, title, filename, label_corrected):
     plt.close()
     print(f"Figura salvata: {Path(filename).resolve()}")
 
-radar_plot(means2_raw, means2_refined,
-           "2-Agent Pipeline: Raw vs Refined",
-           "rq3_radar_2agent.png",
-           "Refined (Agent 2)")
 
-radar_plot(means3_raw, means3_final,
-           "3-Agent Pipeline: Raw vs Final",
-           "rq3_radar_3agent.png",
-           "Final (Agent 3)")
+# =========================
+# MAIN
+# =========================
+
+radar_plot(means2_raw, means2_refined,
+           "Character Scoring — Raw vs Refined",
+           "rq3_radar_2agent.png",
+           "Refined")

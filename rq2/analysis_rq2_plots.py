@@ -44,6 +44,13 @@ ADJECTIVE_TRANSLATIONS = {
     "sensibile": "sensitive"
 }
 
+ROLE_TRANSLATIONS = {
+    "giudice imparziale": "Impartial judge",
+    "giudice imparziale corto": "Impartial judge (short)",
+    "uomo di paese": "Villager",
+    "uomo di paese corto": "Villager (short)"
+}
+
 # =========================
 # BAR CHART — TUTTI GLI AGGETTIVI
 # =========================
@@ -53,13 +60,12 @@ def plot_barchart(df, title, filename):
     df["adjective_en"] = df["aggettivo"].map(ADJECTIVE_TRANSLATIONS).fillna(df["aggettivo"])
     df = df.sort_values("Q", ascending=False, na_position="last")
 
-    adjectives = df["aggettivo"].tolist()
     adjectives_en = df["adjective_en"].tolist()
 
-    x = np.arange(len(adjectives))
+    x = np.arange(len(adjectives_en))
     width = 0.2
 
-    fig, ax = plt.subplots(figsize=(max(12, len(adjectives) * 0.9), 6))
+    fig, ax = plt.subplots(figsize=(max(12, len(adjectives_en) * 0.9), 6))
 
     for i, lang in enumerate(LANGUAGES):
         col = f"prop_{lang}"
@@ -151,11 +157,12 @@ for ruolo in df_roles["ruolo"].unique():
     print(f"\nRuolo: {ruolo}")
     df_r = df_roles[df_roles["ruolo"] == ruolo]
     label = ruolo.replace(" ", "_")
+    title_en = ROLE_TRANSLATIONS.get(ruolo, ruolo)
 
     plot_barchart(df_r,
-                  f"Proportion of Yes responses per adjective — {ruolo}",
+                  f"Proportion of Yes responses per adjective — {title_en}",
                   f"rq2_barchart_{label}.png")
 
     plot_dotplot(df_r,
-                 f"Q statistic per adjective — {ruolo}",
+                 f"Q statistic per adjective — {title_en}",
                  f"rq2_dotplot_{label}.png")
