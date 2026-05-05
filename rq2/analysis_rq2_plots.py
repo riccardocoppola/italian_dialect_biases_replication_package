@@ -14,7 +14,7 @@ LANGUAGES = ["italiano", "napoletano", "parmigiano", "siciliano"]
 LANG_LABELS = {
     "italiano": "ITA",
     "napoletano": "NAP",
-    "parmigiano": "EML",
+    "parmigiano": "PAR",
     "siciliano": "SIC"
 }
 COLOURS = {
@@ -24,37 +24,56 @@ COLOURS = {
     "siciliano": "#3498db"
 }
 
+ADJECTIVE_TRANSLATIONS = {
+    "sporca": "dirty",
+    "pulita": "clean",
+    "rumorosa": "noisy",
+    "fredda": "cold",
+    "affettuosa": "affectionate",
+    "ritardataria": "tardy",
+    "pia": "pious",
+    "onesta": "honest",
+    "furba": "cunning",
+    "precisa": "precise",
+    "divertente": "funny",
+    "noiosa": "boring",
+    "educata": "polite",
+    "maleducata": "rude",
+    "inesperta": "inexperienced",
+    "colta": "educated",
+    "sensibile": "sensitive"
+}
+
 # =========================
-# OPZIONE B — BAR CHART PER AGGETTIVO SIGNIFICATIVO
+# BAR CHART — TUTTI GLI AGGETTIVI
 # =========================
 
 def plot_barchart(df, title, filename):
-    # filtra solo aggettivi significativi
-    sig = df[df["significant"] == True].copy()
+    df = df.copy()
+    df["adjective_en"] = df["aggettivo"].map(ADJECTIVE_TRANSLATIONS).fillna(df["aggettivo"])
+    df = df.sort_values("Q", ascending=False, na_position="last")
 
-    if sig.empty:
-        print(f"Nessun aggettivo significativo per {title}")
-        return
-
-    sig = sig.sort_values("Q", ascending=False)
-    adjectives = sig["aggettivo"].tolist()
+    adjectives = df["aggettivo"].tolist()
+    adjectives_en = df["adjective_en"].tolist()
 
     x = np.arange(len(adjectives))
     width = 0.2
 
-    fig, ax = plt.subplots(figsize=(max(10, len(adjectives) * 0.8), 6))
+    fig, ax = plt.subplots(figsize=(max(12, len(adjectives) * 0.9), 6))
 
     for i, lang in enumerate(LANGUAGES):
         col = f"prop_{lang}"
-        values = sig[col].values
+        if col not in df.columns:
+            continue
+        values = df[col].values
         ax.bar(x + i * width, values, width,
                label=LANG_LABELS[lang],
                color=COLOURS[lang],
                alpha=0.85)
 
     ax.set_xticks(x + width * 1.5)
-    ax.set_xticklabels(adjectives, rotation=30, ha="right", fontsize=10)
-    ax.set_ylabel("Proporzione di Sì")
+    ax.set_xticklabels(adjectives_en, rotation=30, ha="right", fontsize=10)
+    ax.set_ylabel("Proportion of Yes responses")
     ax.set_title(title, fontweight="bold", fontsize=13)
     ax.legend()
     ax.grid(axis="y", linestyle="--", alpha=0.4)
@@ -66,22 +85,22 @@ def plot_barchart(df, title, filename):
 
 
 # =========================
-# OPZIONE C — DOT PLOT CON Q STATISTIC
+# DOT PLOT CON Q STATISTIC
 # =========================
 
 def plot_dotplot(df, title, filename):
     df = df.copy().sort_values("Q", ascending=True, na_position="first")
     df = df[df["Q"].notna()]
+    df["adjective_en"] = df["aggettivo"].map(ADJECTIVE_TRANSLATIONS).fillna(df["aggettivo"])
 
     fig, ax = plt.subplots(figsize=(10, max(6, len(df) * 0.4)))
 
     for _, row in df.iterrows():
         q = row["Q"]
-        adj = row["aggettivo"]
+        adj = row["adjective_en"]
         sig = row["significant"]
 
         color = "#e74c3c" if sig else "#95a5a6"
-        marker = "o" if sig else "o"
         size = 80 if sig else 40
 
         ax.scatter(q, adj, color=color, s=size, zorder=3)
@@ -93,13 +112,12 @@ def plot_dotplot(df, title, filename):
     ax.set_title(title, fontweight="bold", fontsize=13)
     ax.grid(axis="x", linestyle="--", alpha=0.4)
 
-    # legenda manuale
     from matplotlib.lines import Line2D
     handles = [
         Line2D([0], [0], marker="o", color="w", markerfacecolor="#e74c3c",
-               markersize=10, label="Significativo (p < 0.05)"),
+               markersize=10, label="Significant (p < 0.05)"),
         Line2D([0], [0], marker="o", color="w", markerfacecolor="#95a5a6",
-               markersize=7, label="Non significativo")
+               markersize=7, label="Not significant")
     ]
     ax.legend(handles=handles, loc="lower right")
 
@@ -118,11 +136,11 @@ print("=== BASELINE ===")
 df_base = pd.read_csv(BASELINE_RESULTS)
 
 plot_barchart(df_base,
-              "Proporzione Sì per aggettivo significativo — Baseline",
+              "Proportion of Yes responses per adjective — Baseline",
               "rq2_barchart_baseline.png")
 
 plot_dotplot(df_base,
-             "Q statistic per aggettivo — Baseline",
+             "Q statistic per adjective — Baseline",
              "rq2_dotplot_baseline.png")
 
 # --- RUOLI ---
@@ -132,13 +150,12 @@ df_roles = pd.read_csv(ROLES_RESULTS)
 for ruolo in df_roles["ruolo"].unique():
     print(f"\nRuolo: {ruolo}")
     df_r = df_roles[df_roles["ruolo"] == ruolo]
-
     label = ruolo.replace(" ", "_")
 
     plot_barchart(df_r,
-                  f"Proporzione Sì per aggettivo significativo — {ruolo}",
+                  f"Proportion of Yes responses per adjective — {ruolo}",
                   f"rq2_barchart_{label}.png")
 
     plot_dotplot(df_r,
-                 f"Q statistic per aggettivo — {ruolo}",
+                 f"Q statistic per adjective — {ruolo}",
                  f"rq2_dotplot_{label}.png")
