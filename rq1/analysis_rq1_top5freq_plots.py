@@ -8,15 +8,15 @@ CSV_FILE = "job_assignment_no_bias_correction.csv"
 LANGUAGES = ["Italian", "Napoletano", "Parmigiano", "Sicilian"]
 LANG_LABELS = {
     "Italian": "ITA",
-    "Napoletano": "NAP",
+    "Napoletano": "NEA",
     "Parmigiano": "PAR",
     "Sicilian": "SIC"
 }
 COLOURS = {
-    "Italian": "#95a5a6",
-    "Napoletano": "#2ecc71",
-    "Parmigiano": "#e67e22",
-    "Sicilian": "#3498db"
+    "Italian":    "#a6cee3",
+    "Napoletano": "#1f78b4",
+    "Parmigiano": "#b2df8a",
+    "Sicilian":   "#33a02c"
 }
 
 JOB_TRANSLATIONS = {
@@ -70,7 +70,7 @@ for profile in sorted(df["profile"].unique()):
     width = 0.2
     offsets = [-1.5, -0.5, 0.5, 1.5]
 
-    fig, ax = plt.subplots(figsize=(10, 5))
+    fig, ax = plt.subplots(figsize=(10, 6))
 
     for i, lang in enumerate(LANGUAGES):
         lang_row = sub[sub["language"] == lang]
@@ -78,18 +78,25 @@ for profile in sorted(df["profile"].unique()):
             continue
         values = [lang_row[j].values[0] if j in lang_row.columns else 0
                   for j in top5_jobs]
-        ax.bar(x + offsets[i] * width, values,
-               width=width,
-               color=COLOURS[lang],
-               label=LANG_LABELS[lang],
-               alpha=0.85)
+        ax.bar(
+            x + offsets[i] * width,
+            values,
+            width=width,
+            color=COLOURS[lang],
+            label=LANG_LABELS[lang],
+            alpha=0.85
+        )
 
     ax.set_xticks(x)
-    ax.set_xticklabels(top5_labels, rotation=15, ha="right", fontsize=10)
-    ax.set_ylabel("Frequency (out of 30 runs)")
-    ax.set_title(f"Top 5 most assigned jobs — Profile {profile}",
-                 fontweight="bold", fontsize=13)
-    ax.legend(title="Variety")
+    ax.set_xticklabels(top5_labels, rotation=15, ha="right", fontsize=18)
+    ax.set_ylabel("Frequency (out of 30 runs)", fontsize=22)
+    ax.set_title(
+        f"Top 5 most assigned jobs — Profile {profile}",
+        fontweight="bold",
+        fontsize=22
+    )
+    ax.tick_params(axis="y", labelsize=18)
+    ax.legend(title="Variety", fontsize=16, title_fontsize=16)
     ax.grid(axis="y", linestyle="--", alpha=0.4)
 
     plt.tight_layout()

@@ -27,7 +27,7 @@ DIMENSION_LABELS = {
 LANGUAGES = ["Italiano (Auto)", "Napoletano", "Parmigiano", "Siciliano"]
 LANG_LABELS = {
     "Italiano (Auto)": "ITA",
-    "Napoletano": "NAP",
+    "Napoletano": "NEA",
     "Parmigiano": "PAR",
     "Siciliano": "SIC"
 }

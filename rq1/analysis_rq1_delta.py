@@ -31,7 +31,7 @@ def process(input_file, output_file):
 
         ita = sub.loc["Italian", job_cols]
 
-        for dialect, label in [("Napoletano", "delta_NAP"), ("Parmigiano", "delta_PAR"), ("Sicilian", "delta_SIC")]:
+        for dialect, label in [("Napoletano", "delta_NEA"), ("Parmigiano", "delta_PAR"), ("Sicilian", "delta_SIC")]:
             if dialect not in sub.index:
                 continue
             dial = sub.loc[dialect, job_cols]
@@ -46,7 +46,7 @@ def process(input_file, output_file):
     # STEP 3 — media dei 5 delta per confronto
     # =========================
     mean_rows = []
-    for label in ["delta_NAP", "delta_PAR", "delta_SIC"]:
+    for label in ["delta_NEA", "delta_PAR", "delta_SIC"]:
         sub = df_deltas[df_deltas["language"] == label][job_cols]
         mean = sub.mean()
         row = {"profile": "mean", "language": f"mean_{label}"}
@@ -59,7 +59,7 @@ def process(input_file, output_file):
     # STEP 4 — media di tutti i job per ogni mean_delta
     # =========================
     global_mean_rows = []
-    for label in ["mean_delta_NAP", "mean_delta_PAR", "mean_delta_SIC"]:
+    for label in ["mean_delta_NEA", "mean_delta_PAR", "mean_delta_SIC"]:
         sub = df_means[df_means["language"] == label][job_cols]
         global_mean = sub.mean(axis=1).values[0]
         row = {"profile": "global_mean", "language": f"global_{label}"}

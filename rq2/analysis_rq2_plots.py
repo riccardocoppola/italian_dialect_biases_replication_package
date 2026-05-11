@@ -13,15 +13,15 @@ ROLES_RESULTS = "rq2_cochran_roles_results.csv"
 LANGUAGES = ["italiano", "napoletano", "parmigiano", "siciliano"]
 LANG_LABELS = {
     "italiano": "ITA",
-    "napoletano": "NAP",
+    "napoletano": "NEA",
     "parmigiano": "PAR",
     "siciliano": "SIC"
 }
 COLOURS = {
-    "italiano": "#95a5a6",
-    "napoletano": "#2ecc71",
-    "parmigiano": "#e67e22",
-    "siciliano": "#3498db"
+    "italiano":   "#a6cee3",
+    "napoletano": "#1f78b4",
+    "parmigiano": "#b2df8a",
+    "siciliano":  "#33a02c"
 }
 
 ADJECTIVE_TRANSLATIONS = {
@@ -78,10 +78,11 @@ def plot_barchart(df, title, filename):
                alpha=0.85)
 
     ax.set_xticks(x + width * 1.5)
-    ax.set_xticklabels(adjectives_en, rotation=30, ha="right", fontsize=10)
-    ax.set_ylabel("Proportion of Yes responses")
-    ax.set_title(title, fontweight="bold", fontsize=13)
-    ax.legend()
+    ax.set_xticklabels(adjectives_en, rotation=30, ha="right", fontsize=18)
+    ax.set_ylabel("Proportion of Yes responses", fontsize=22)
+    ax.set_title(title, fontweight="bold", fontsize=22)
+    ax.tick_params(axis="y", labelsize=18)
+    ax.legend(fontsize=16)
     ax.grid(axis="y", linestyle="--", alpha=0.4)
 
     plt.tight_layout()
@@ -114,8 +115,9 @@ def plot_dotplot(df, title, filename):
             ax.hlines(adj, 0, q, color=color, lw=1.5, alpha=0.6)
 
     ax.axvline(0, color="black", lw=1)
-    ax.set_xlabel("Q statistic (Cochran's Q)")
-    ax.set_title(title, fontweight="bold", fontsize=13)
+    ax.set_xlabel("Q statistic (Cochran's Q)", fontsize=22)
+    ax.set_title(title, fontweight="bold", fontsize=22)
+    ax.tick_params(axis="both", labelsize=18)
     ax.grid(axis="x", linestyle="--", alpha=0.4)
 
     from matplotlib.lines import Line2D
@@ -125,7 +127,7 @@ def plot_dotplot(df, title, filename):
         Line2D([0], [0], marker="o", color="w", markerfacecolor="#95a5a6",
                markersize=7, label="Not significant")
     ]
-    ax.legend(handles=handles, loc="lower right")
+    ax.legend(handles=handles, loc="lower right", fontsize=16)
 
     plt.tight_layout()
     plt.savefig(filename, dpi=300, bbox_inches="tight")
