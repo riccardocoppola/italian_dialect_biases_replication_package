@@ -25,12 +25,12 @@ COLOURS = {
 
 DIALECTS = ["Napoletano", "Parmigiano", "Sicilian"]
 DELTA_COLOURS = {
-    "delta_NEA": "#1f78b4",
+    "delta_NAP": "#1f78b4",
     "delta_PAR": "#b2df8a",
     "delta_SIC": "#33a02c"
 }
 DELTA_LABELS = {
-    "delta_NEA": "NEA-ITA",
+    "delta_NAP": "NEA-ITA",
     "delta_PAR": "PAR-ITA",
     "delta_SIC": "SIC-ITA"
 }
@@ -148,7 +148,7 @@ def plot_boxplot_per_profile(df):
     for profile in get_profiles(df):
         sub_delta = df[
             (df["profile"] == profile) &
-            (df["language"].isin(["delta_NEA", "delta_PAR", "delta_SIC"]))
+            (df["language"].isin(["delta_NAP", "delta_PAR", "delta_SIC"]))
         ]
 
         if sub_delta.empty:
@@ -158,7 +158,7 @@ def plot_boxplot_per_profile(df):
         box_labels = []
         colors = []
 
-        for delta_label in ["delta_NEA", "delta_PAR", "delta_SIC"]:
+        for delta_label in ["delta_NAP", "delta_PAR", "delta_SIC"]:
             row = sub_delta[sub_delta["language"] == delta_label]
             if row.empty:
                 continue
@@ -172,7 +172,7 @@ def plot_boxplot_per_profile(df):
             continue
 
         fig, ax = plt.subplots(figsize=(8, 6))
-        bp = ax.boxplot(data, patch_artist=True, labels=box_labels)
+        bp = ax.boxplot(data, patch_artist=True, tick_labels=box_labels)
 
         for patch, color in zip(bp["boxes"], colors):
             patch.set_facecolor(color)

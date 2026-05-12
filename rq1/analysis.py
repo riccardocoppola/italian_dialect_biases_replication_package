@@ -23,7 +23,7 @@ LANGUAGES = ["Italian", "Napoletano", "Parmigiano", "Sicilian"]
 
 PLOT_LABELS = {
     "Italian": "ITA",
-    "Napoletano": "NAP",
+    "Napoletano": "NEA",
     "Parmigiano": "PAR",
     "Sicilian": "SIC"
     
@@ -262,18 +262,18 @@ print(
 global_counts = df.groupby("language")[job_cols].sum().reindex(LANGUAGES)
 
 
-diff_nap = global_counts.loc["Napoletano"] - global_counts.loc["Italian"]
+diff_nea = global_counts.loc["Napoletano"] - global_counts.loc["Italian"]
 diff_par = global_counts.loc["Parmigiano"] - global_counts.loc["Italian"]
 diff_sic = global_counts.loc["Sicilian"] - global_counts.loc["Italian"]
 
 
 diffs_df = pd.DataFrame({
     "ITA": global_counts.loc["Italian"],
-    "NAP": global_counts.loc["Napoletano"],
+    "NEA": global_counts.loc["Napoletano"],
     "PAR": global_counts.loc["Parmigiano"],
     "SIC": global_counts.loc["Sicilian"],
     
-    "diff_NAP_vs_ITA": diff_nap,
+    "diff_NEA_vs_ITA": diff_nea,
     "diff_PAR_vs_ITA": diff_par,
     "diff_SIC_vs_ITA": diff_sic,
     
@@ -281,7 +281,7 @@ diffs_df = pd.DataFrame({
 })
 
 diffs_df["max_abs_diff"] = diffs_df[
-    ["diff_NAP_vs_ITA", "diff_PAR_vs_ITA", "diff_SIC_vs_ITA"]
+    ["diff_NEA_vs_ITA", "diff_PAR_vs_ITA", "diff_SIC_vs_ITA"]
 ].abs().max(axis=1)
 
 diffs_df = diffs_df.sort_values("max_abs_diff", ascending=False)
@@ -297,7 +297,7 @@ ita_ref = plot_df["ITA"]
 
 panels = [
    
-    ("ITA vs NAP", plot_df["diff_NAP_vs_ITA"], "NAP"),
+    ("ITA vs NEA", plot_df["diff_NEA_vs_ITA"], "NEA"),
     ("ITA vs PAR", plot_df["diff_PAR_vs_ITA"], "PAR"),
     ("ITA vs SIC", plot_df["diff_SIC_vs_ITA"], "SIC")
 ]
@@ -311,7 +311,7 @@ fig.suptitle("Occupational Distribution Differences: Dialects vs. Standard Itali
 
 dialect_colours = {
     "ITA": "#95a5a6",
-    "NAP": "#2ecc71",
+    "NEA": "#2ecc71",
     "PAR": "#e67e22",
     "SIC": "#3498db",
     
@@ -333,7 +333,7 @@ handles = [
     plt.Line2D([0], [0], marker="o", color="w", markerfacecolor=dialect_colours["ITA"], markersize=8, label="ITA"),
     plt.Line2D([0], [0], marker="o", color="w", markerfacecolor=dialect_colours["SIC"], markersize=8, label="SIC"),
     plt.Line2D([0], [0], marker="o", color="w", markerfacecolor=dialect_colours["PAR"], markersize=8, label="PAR"),
-    plt.Line2D([0], [0], marker="o", color="w", markerfacecolor=dialect_colours["NAP"], markersize=8, label="NAP"),
+    plt.Line2D([0], [0], marker="o", color="w", markerfacecolor=dialect_colours["NEA"], markersize=8, label="NEA"),
 ]
 fig.legend(handles=handles, loc="upper center", ncol=4, frameon=False, bbox_to_anchor=(0.5, 0.945))
 

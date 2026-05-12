@@ -4,7 +4,7 @@ import numpy as np
 df = pd.read_csv("job_assignment_no_bias_correction_with_deltas.csv")
 job_cols = [c for c in df.columns if c not in ["profile", "language"]]
 
-for delta in ["delta_NAP", "delta_PAR", "delta_SIC"]:
+for delta in ["delta_NEA", "delta_PAR", "delta_SIC"]:
     print(f"\n=== {delta} ===")
     for profile in ["1", "2", "3", "4", "5"]:
         row = df[(df["profile"].astype(str) == profile) & (df["language"] == delta)]
